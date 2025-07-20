@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/api_gateway.conf:/etc/nginx/api_gateway.conf:ro
+      - ./nginx/api_backends.conf:/etc/nginx/api_backends.conf:ro
+      - ./nginx/api_conf.d:/etc/nginx/api_conf.d:ro
+      - ./nginx/api_json_errors.conf:/etc/nginx/api_json_errors.conf:ro
+
+  user_service:
+    build: 
+      context: .
+      dockerfile: services/user/Dockerfile
+    environment:
+      - NEONDB_URL=postgresql://user:pass@your-neon-db-host/dbname
+    ports:
+      - "5001:5001"
+
+  product_service:
+    build:
+      context: .
+      dockerfile: services/product/Dockerfile
+    environment:
+      - NEONDB_URL=postgresql://user:pass@your-neon-db-host/dbname
+    ports:
+      - "5002:5002"
+
+  # Add other services similarly

@@ -1,0 +1,64 @@
+project-root/
+├── nginx/
+│   ├── nginx.conf
+│   ├── api_gateway.conf
+│   ├── api_backends.conf
+│   ├── api_conf.d/
+│   │   ├── users_api.conf
+│   │   ├── products_api.conf
+│   │   └── ...
+│   ├── api_json_errors.conf
+│   └── ssl/
+│       ├── api.crt
+│       └── api.key
+├── ml_service/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── model.py
+│   │   └── utils.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── rate_limiter/
+│   ├── limiter.py
+│   ├── redis_client.py
+│   └── requirements.txt
+├── cache/
+│   └── redis.conf
+├── monitoring/
+│   ├── prometheus.yml
+│   ├── grafana/
+│   │   └── dashboards/
+│   └── elk/
+│       ├── elasticsearch.yml
+│       ├── logstash.conf
+│       └── kibana.yml
+├── k8s/
+│   ├── nginx-deployment.yaml
+│   ├── ml-service-deployment.yaml
+│   ├── redis-deployment.yaml
+│   ├── postgres-deployment.yaml
+│   ├── prometheus-deployment.yaml
+│   ├── grafana-deployment.yaml
+│   └── ...
+├── docker/
+│   ├── nginx/
+│   │   └── Dockerfile
+│   ├── ml_service/
+│   │   └── Dockerfile
+│   ├── redis/
+│   │   └── Dockerfile
+│   └── postgres/
+│       └── Dockerfile
+├── scripts/
+│   ├── init_db.sh
+│   ├── deploy.sh
+│   └── health_check.sh
+├── docs/
+│   ├── architecture.md
+│   ├── api_spec.md
+│   ├── usage_guide.md
+│   └── ...
+├── .env
+├── .gitignore
+└── README.md
