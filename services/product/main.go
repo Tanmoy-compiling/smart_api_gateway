@@ -1,64 +1,38 @@
-package product
-
-import (
-	"context"
-	"log"
-	"net"
-
-	pb "github.com/your-username/smart_api_gateway/proto/product"
-	"google.golang.org/grpc"
-
-	"github.com/gin-gonic/gin"
-	"smart_api_gateway/pkg/common/database"
-)
-
-type server struct {
-	pb.UnimplementedProductServiceServer
-}
-
-func (s *server) GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb.GetProductResponse, error) {
-	// Mock product data
-	product := &pb.Product{
-		Id:          req.ProductId,
-		Name:        "Sample Product",
-		Description: "This is a sample product",
-		Price:       99.99,
-	}
-
-	return &pb.GetProductResponse{
-		Product: product,
-	}, nil
-}
-
 package main
 
+import (
+	"log"
+	"net/http"
+
+	"smart_api_gateway/pkg/common/conf"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+)
+
 func main() {
-	// Initialize Gin
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found, using system environment only")
+	}
+    
+	if err := conf.InitDB(); err != nil {
+		log.Fatalf("Failed to initialize DB: %v", err)
+	}
+	defer conf.CloseDB()
+
 	r := gin.Default()
 
-	// Initialize DB
-	if err := database.InitDB(); err != nil {
-		panic(err)
-	}
+	// Example route just to check app is running
+	r.GET("/health", func(c *gin.Context) {
+		// Optionally check DB connection health
+		if err := conf.DB.Ping(c); err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "db unreachable"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
 
-	// Setup routes
-	SetupRoutes(r)
-
-	// Start server
-	r.Run(":5002")
-}
-
-func main() {
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
-	}
-
-	s := grpc.NewServer()
-	pb.RegisterProductServiceServer(s, &server{})
-
-	log.Printf("Product service server starting on :50051")
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
-	}
+	log.Println("Product service running on :5002")
+	r.Run(":5002") // Start HTTP server
 }

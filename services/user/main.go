@@ -1,27 +1,38 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "smart_api_gateway/pkg/common/database"
-    "smart_api_gateway/pkg/common/middleware"
-    "smart_api_gateway/services/user/handlers"
+	"log"
+	"net/http"
+
+	"smart_api_gateway/pkg/common/conf"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-    r := gin.Default()
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found, using system environment only")
+	}
     
-    // Initialize DB
-    if err := database.InitDB(); err != nil {
-        panic(err)
-    }
-    
-    // Routes
-    v1 := r.Group("/api/v1")
-    {
-        v1.POST("/register", handlers.Register)
-        v1.POST("/login", handlers.Login)
-        v1.GET("/profile", middleware.AuthRequired(), handlers.GetProfile)
-    }
-    
-    r.Run(":5001")
+	if err := conf.InitDB(); err != nil {
+		log.Fatalf("Failed to initialize DB: %v", err)
+	}
+	defer conf.CloseDB()
+
+	r := gin.Default()
+
+	// Example route just to check app is running
+	r.GET("/health", func(c *gin.Context) {
+		// Optionally check DB connection health
+		if err := conf.DB.Ping(c); err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "db unreachable"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	log.Println("User service running on :5001")
+	r.Run(":5001") // Start HTTP server
 }

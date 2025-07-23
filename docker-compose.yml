@@ -16,7 +16,7 @@ services:
       context: .
       dockerfile: services/user/Dockerfile
     environment:
-      - NEONDB_URL=postgresql://user:pass@your-neon-db-host/dbname
+      - DATABASE_URL=postgresql://neondb_owner:npg_F3pb2TlkKWRY@ep-shy-recipe-a103rmpr.ap-southeast-1.aws.neon.tech/Serrvices?sslmode=require&channel_binding=require
     ports:
       - "5001:5001"
 
@@ -25,7 +25,7 @@ services:
       context: .
       dockerfile: services/product/Dockerfile
     environment:
-      - NEONDB_URL=postgresql://user:pass@your-neon-db-host/dbname
+      - DATABASE_URL=postgresql://neondb_owner:npg_F3pb2TlkKWRY@ep-shy-recipe-a103rmpr.ap-southeast-1.aws.neon.tech/Serrvices?sslmode=require&channel_binding=require
     ports:
       - "5002:5002"
 
